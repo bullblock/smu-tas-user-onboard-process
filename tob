@@ -1,0 +1,218 @@
+#!/bin/bash
+#set -x
+#set -v
+if [[ "$1" != "" && "$2" != "" && "$3" != "" && "$4" != "" && "$5" != "" && "$6" != "" && "$7" != "" && "$8" != "" && "$9" != "" && "$10" != "" ]]
+then
+  case "$1" in
+    -u|--adminid)
+      ADMINID="$2"
+    ;;
+    -p|--adminpwd)
+      ADMINPWD="$2"
+    ;;
+    -s|--server)
+      SERVER="$2"
+    ;;
+    -f|--file)
+      INPUT="$2"
+    ;;
+    -r|--result)
+      RESULT="$2"
+    ;;
+    *)
+      echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
+      exit 1
+    ;;
+  esac
+
+  case "$3" in
+    -u|--adminid)
+      ADMINID="$4"
+    ;;
+    -p|--adminpwd)
+      ADMINPWD="$4"
+    ;;
+    -s|--server)
+      SERVER="$4"
+    ;;
+    -f|--file)
+      INPUT="$4"
+    ;;
+    -r|--result)
+      RESULT="$4"
+    ;;
+    *)
+      echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
+      exit 1
+    ;;
+  esac
+
+  case "$5" in
+    -u|--adminid)
+      ADMINID="$6"
+    ;;
+    -p|--adminpwd)
+      ADMINPWD="$6"
+    ;;
+    -s|--server)
+      SERVER="$6"
+    ;;
+    -f|--file)
+      INPUT="$6"
+    ;;
+    -r|--result)
+      RESULT="$6"
+    ;;
+    *)
+      echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
+      exit 1
+    ;;
+  esac
+
+  case "$7" in
+    -u|--adminid)
+      ADMINID="$8"
+    ;;
+    -p|--adminpwd)
+      ADMINPWD="$8"
+    ;;
+    -s|--server)
+      SERVER="$8"
+    ;;
+    -f|--file)
+      INPUT="$8"
+    ;;
+    -r|--result)
+      RESULT="$8"
+    ;;
+    *)
+      echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
+      exit 1
+    ;;
+  esac
+
+  case "$9" in
+    -u|--adminid)
+      ADMINID="${10}"
+    ;;
+    -p|--adminpwd)
+      ADMINPWD="${10}"
+    ;;
+    -s|--server)
+      SERVER="${10}"
+    ;;
+    -f|--file)
+      INPUT="${10}"
+    ;;
+    -r|--result)
+      RESULT="${10}"
+    ;;
+    *)
+      echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
+      exit 1
+    ;;
+  esac
+fi
+while [ "$#" -le 9 ]
+do
+  echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
+  exit
+done
+
+[ -d ~/.tob ] && echo "TAS onborading user working dirctory is exsit..." || mkdir -p ~/.tob
+[ -f ~/.tob/tob.conf ] && { source ~/.tob/tob.conf } || { echo "the tob.conf file is not exsit" ; exit 1 ; }
+[ -f $TOB_WORKING_FILE ] && { echo "tob has been ran before ..." } || { echo -e "Item,Fist Name,Last Name,User ID,eMail,Password,Enabled,Updated" > TOB_WORKING_FILE } 
+echo -e "Item,Fist Name,Last Name,User ID,eMail,Password,Enabled" > $RESULT
+[ -z $COMMAND ] && { echo "not able to find command $COMMAND in the system"; exit 1 ; }
+
+exec < "TOB_WORKING_FILE" || { echo "tob working file $TOB_WORKING_FILE is not exist"; exit 1; }
+#read header
+while IFS=, read -r ex_ITEM ex_FNAME ex_LNAME ex_USERID ex_EMAIL ex_PASSWORD ex_STATUS ex_UPDATED; do
+  ex_UPDATED=$(echo "ex_UPDATED" | tr -d '\r')
+  exec < "$INPUT" || { echo "the input file $INPUT is not exist"; exit 1; }
+  read header
+  while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS; do
+    STATUS=$(echo "$STATUS" | tr -d '\r')
+    if [ $Item != $ex_ITEM ]
+    then 
+       ex_UPDATED=yes
+       ex_ITEM=$Item
+    elif [ $FNAME != $ex_FNAME ]
+    then
+       ex_UPDATED=yes
+       ex_FNAME=$FNAME
+    elif [ $LNAME != $ex_LNAME ]
+    then
+       ex_UPDATED=yes
+       ex_LNAME=$LNAME
+    elif [ $USERID != $ex_USERID ]
+    then
+       ex_UPDATED=yes
+       ex_USERID=$USERID
+    elif [ $EMAIL != $ex_EMAIL ]
+    then
+       ex_UPDATED=yes
+       ex_EMAIL=$EMAIL
+    elif [ $PASSWORD != $ex_PASSWORD ]
+    then
+       ex_UPDATED=yes
+       ex_PASSWORD=$PASSWORD
+    elif [ $STATUS != $ex_STATUS ]
+       ex_UPDATED=yes
+       ex_STATUS=$STATUS
+    else
+       ex_UPDATED=no
+    fi
+  done
+ 
+  if [[ "$ex_UPDATED" == "yes" && "$STATUS" == "yes" ]]; 
+  then 
+    [ -z "$ex_USERID" ] && ex_USERID="$(echo $ex_FNAME | head -c 1)$ex_LNAME"
+    [ -z "$ex_PASSWORD" ] && { ex_PASSWORD=$(dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-8) }
+    echo -e "$ex_ITEM,$ex_FNAME,$ex_LNAME,$ex_USERID,$ex_EMAIL,$ex_PASSWORD,$ex_STATUS,$ex_UPDATED" >> $TOB_WORKING_FILE2
+done
+move $TOB_WORKING_FILE2 $TOB_WORKING_FILE
+
+$COMMAND api $SERVER --skip-ssl-validation
+$COMMAND login -u $ADMINID -p $ADMINPWD -o system
+$COMMAND target
+$COMMAND quotas
+$COMMAND update-org-quota default -m 1g -i 1g -r 10 -s 5 -a 5 --allow-paid-service-plans --reserved-route-ports 5
+
+exec < "$TOB_WORKING_FILE" || { echo "the input file $TOB_WORKING_FILE is not exist"; exit 1; }
+#read header
+while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS UPDATED; do
+UPDATED=$(echo "$UPDATED" | tr -d '\r')
+ORGID="$USERID"
+SPACEID="$USERID"
+$COMMAND delete-org -f $ORGID
+$COMMAND $CREATE_ORG $ORGID -q default
+$COMMAND $CREATE_SPACE $SPACEID -o $ORGID 
+$COMMAND delete-user -f $USERID
+$COMMAND $CREATE_USER $USERID $PASSWORD
+$COMMAND $SET_ORG_ROLE $USERID $ORGID OrgManager
+$COMMAND $SET_ORG_ROLE $USERID $ORGID BillingManager
+$COMMAND $SET_ORG_ROLE $USERID $ORGID OrgAuditor
+$COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceManager
+$COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceDeveloper
+$COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceAuditor
+
+$SENDMAIL -i $EMAIL <<MAIL_END
+Subject: SMU Tanzu Application Service User On-boarding Message
+To: $EMAIL
+Dear $FNAME $LNAME,
+
+  Your SMU Tanzu Application Service demo account is ready:
+
+Access URL:\t\thttps://console.tas.hackathon.systems
+UserID:\t\t$USERID
+Password:\t\t$PASSWORD
+
+All the best.
+VMware CNA team
+MAIL_END
+
+echo -e "$ITEM,$FNAME,$LNAME,$USERID,$EMAIL,$PASSWORD,done" >> $RESULT
+done
+cat $RESULT | column -t -s ","
+
