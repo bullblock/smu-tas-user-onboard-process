@@ -166,7 +166,7 @@ while IFS=, read -r ex_ITEM ex_FNAME ex_LNAME ex_USERID ex_EMAIL ex_PASSWORD ex_
     fi
   done
  
-  if [[ "$ex_UPDATED" == "yes" && "$STATUS" == "yes" ]]; 
+  if [[ "$ex_UPDATED" == "yes" && "$STATUS" == "yes" ]] 
   then 
     [ -z "$ex_USERID" ] && ex_USERID="$(echo $ex_FNAME | head -c 1)$ex_LNAME"
     [ -z "$ex_PASSWORD" ] && { ex_PASSWORD=$(dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-8) }
