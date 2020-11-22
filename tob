@@ -127,11 +127,15 @@ echo -e "Item,Fist Name,Last Name,User ID,eMail,Password,Enabled" > $RESULT
 
 exec < "TOB_WORKING_FILE" || { echo "tob working file $TOB_WORKING_FILE is not exist"; exit 1; }
 #read header
-while IFS=, read -r ex_ITEM ex_FNAME ex_LNAME ex_USERID ex_EMAIL ex_PASSWORD ex_STATUS ex_UPDATED; do
+while IFS=, read -r ex_ITEM ex_FNAME ex_LNAME ex_USERID ex_EMAIL ex_PASSWORD ex_STATUS ex_UPDATED 
+do
+{
   ex_UPDATED=$(echo "ex_UPDATED" | tr -d '\r')
   exec < "$INPUT" || { echo "the input file $INPUT is not exist"; exit 1; }
   read header
-  while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS; do
+  while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS
+  do
+  {
     STATUS=$(echo "$STATUS" | tr -d '\r')
     if [ $Item != $ex_ITEM ]
     then 
@@ -164,6 +168,7 @@ while IFS=, read -r ex_ITEM ex_FNAME ex_LNAME ex_USERID ex_EMAIL ex_PASSWORD ex_
     else
        ex_UPDATED=no
     fi
+  }
   done
  
   if [[ "$ex_UPDATED" == "yes" && "$STATUS" == "yes" ]] 
@@ -171,6 +176,7 @@ while IFS=, read -r ex_ITEM ex_FNAME ex_LNAME ex_USERID ex_EMAIL ex_PASSWORD ex_
     [ -z "$ex_USERID" ] && ex_USERID="$(echo $ex_FNAME | head -c 1)$ex_LNAME"
     [ -z "$ex_PASSWORD" ] && { ex_PASSWORD=$(dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-8) }
     echo -e "$ex_ITEM,$ex_FNAME,$ex_LNAME,$ex_USERID,$ex_EMAIL,$ex_PASSWORD,$ex_STATUS,$ex_UPDATED" >> $TOB_WORKING_FILE2
+}
 done
 move $TOB_WORKING_FILE2 $TOB_WORKING_FILE
 
