@@ -1,0 +1,8 @@
+#!/bin/bash
+
+exec < "$1"
+read header
+while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS UPDATED; do
+UPDATED=$(echo "$UPDATED" | tr -d '\r')
+echo "$ITEM $FNAME $LNAME $USERID $EMAIL $PASSWORD $STATUS $UPDATED"
+done
