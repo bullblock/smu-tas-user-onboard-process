@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 #set -v
 if [[ "$1" != "" && "$2" != "" && "$3" != "" && "$4" != "" && "$5" != "" && "$6" != "" && "$7" != "" && "$8" != "" && "$9" != "" && "$10" != "" ]]
 then
@@ -171,4 +171,4 @@ echo -e "$ITEM,$FNAME,$LNAME,$USERID,$EMAIL,$PASSWORD,yes,yes" >> $RESULT
 fi
 
 done
-cat $RESULT | column -t -s ","
+#cat $RESULT | column -t -s ","
