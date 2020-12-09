@@ -1,7 +1,6 @@
 #!/bin/bash
-#set -x
-#set -v
-if [[ "$1" != "" && "$2" != "" && "$3" != "" && "$4" != "" && "$5" != "" && "$6" != "" && "$7" != "" && "$8" != "" && "$9" != "" && "${10}" != "" ]]
+
+if [[ "$1" != "" && "$2" != "" && "$3" != "" && "$4" != "" && "$5" != "" && "$6" != "" && "$7" != "" && "$8" != "" && "$9" != "" && "$10" != "" ]]
 then
   case "$1" in
     -u|--adminid)
@@ -113,66 +112,29 @@ then
     ;;
   esac
 fi
-while [ "$#" -le 9 ]; do
+
+while [ "$#" -le 9 ]
+do
   echo "$0 -u|--adminid <adminid> -p|--adminpwd <adminpwd> -s|--server <api.domain.com> -f|--file <user_list.csv file> -r|--result <output result.csv>"
   exit
 done
 
-[ -d "$PWD/.tob" ] && echo "TAS onborading user working dirctory is exsit..." || mkdir -p "$PWD/.tob"
-[ -f "$PWD/.tob/tob.conf" ] && source "$PWD/.tob/tob.conf"  || { echo "the tob.conf file is not exsit" ; exit 1 ; }
-[ -f "$TOB_WORKING_FILE" ] && echo "tob has been ran before ..." || echo -e "Item,Fist Name,Last Name,User ID,eMail,Password,Enabled,Updated" > "$TOB_WORKING_FILE"
-echo -e "Item,Fist Name,Last Name,User ID,eMail,Password,Enabled" > "$RESULT"
+COMMAND="cf"
+COMMAND=$(which $COMMAND)
 [ -z $COMMAND ] && { echo "not able to find command $COMMAND in the system"; exit 1 ; }
 
 $COMMAND api $SERVER --skip-ssl-validation
 $COMMAND login -u $ADMINID -p $ADMINPWD -o system
 $COMMAND target
 $COMMAND quotas
-$COMMAND update-org-quota default -m 3g -i 3g -r 10 -s 5 -a 5 --allow-paid-service-plans --reserved-route-ports 5
 
 exec < "$INPUT" || { echo "the input file $INPUT is not exist"; exit 1; }
 read header
-while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS UPDATED; do
-UPDATED=$(echo "$UPDATED" | tr -d '\r')
-
-if [ "$STATUS" == "yes" ]; then
-  [ -z "$PASSWORD" ] && PASSWORD="$(dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-8)"
+while IFS=, read -r ITEM FNAME LNAME EMAIL STATUS; do
   USERID="$EMAIL"
   ORGID="$USERID"
   SPACEID="$USERID"
   $COMMAND delete-org -f $ORGID
-  $COMMAND $CREATE_ORG $ORGID -q default
-  $COMMAND $CREATE_SPACE $SPACEID -o $ORGID
   $COMMAND delete-user -f $USERID
-  $COMMAND $CREATE_USER $USERID $PASSWORD
-  $COMMAND $SET_ORG_ROLE $USERID $ORGID OrgManager
-  $COMMAND $SET_ORG_ROLE $USERID $ORGID BillingManager
-  $COMMAND $SET_ORG_ROLE $USERID $ORGID OrgAuditor
-  $COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceManager
-  $COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceDeveloper
-  $COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceAuditor
-
-$SENDMAIL -i $EMAIL <<MAIL_END
-From: DO-NOT-REPLY@tas.hackathon.systems
-Subject: SMU Tanzu Application Service User On-boarding Message
-To: $EMAIL
-Dear $FNAME $LNAME,
-
-  Your SMU Tanzu Application Service demo account is ready:
-
-Access URL:		https://console.tas.hackathon.systems
-UserID:			$USERID
-Password:		$PASSWORD
-
-This is a system generated email, DO NOT reply to this email address
-Any questions and issues please email to esm.paas@gmail.com
-
-All the best.
-VMware CNA team
-MAIL_END
-
-echo -e "$ITEM,$FNAME,$LNAME,$USERID,$EMAIL,$PASSWORD,yes,yes" >> "$RESULT"
-fi
-
 done
-cat "$RESULT" | column -t -s ","
+echo "It's clean now"
