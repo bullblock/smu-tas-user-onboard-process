@@ -123,7 +123,7 @@ COMMAND="cf"
 COMMAND=$(which $COMMAND)
 [ -z $COMMAND ] && { echo "not able to find command $COMMAND in the system"; exit 1 ; }
 
-$COMMAND api $SERVER --skip-ssl-validation
+$COMMAND api $SERVER 
 $COMMAND login -u $ADMINID -p $ADMINPWD -o system
 $COMMAND target
 $COMMAND quotas
