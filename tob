@@ -128,7 +128,7 @@ $COMMAND api $SERVER --skip-ssl-validation
 $COMMAND login -u $ADMINID -p $ADMINPWD -o system
 $COMMAND target
 $COMMAND quotas
-$COMMAND update-org-quota default -m 1g -i 1g -r 10 -s 5 -a 5 --allow-paid-service-plans --reserved-route-ports 5
+$COMMAND update-org-quota default -m 3g -i 3g -r 10 -s 5 -a 5 --allow-paid-service-plans --reserved-route-ports 5
 
 exec < "$INPUT" || { echo "the input file $INPUT is not exist"; exit 1; }
 read header
@@ -136,8 +136,8 @@ while IFS=, read -r ITEM FNAME LNAME USERID EMAIL PASSWORD STATUS UPDATED; do
 UPDATED=$(echo "$UPDATED" | tr -d '\r')
 
 if [ "$STATUS" == "yes" ]; then
-  [ -z "$USERID" ] && USERID="$(echo $FNAME | head -c 1)$LNAME"
-  [ -z "$PASSWORD" ] && PASSWORD=$(dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-8)
+  [ -z "$PASSWORD" ] && PASSWORD="$(dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-8)"
+  USERID="$EMAIL"
   ORGID="$USERID"
   SPACEID="$USERID"
   $COMMAND delete-org -f $ORGID
@@ -153,15 +153,19 @@ if [ "$STATUS" == "yes" ]; then
   $COMMAND $SET_SPACE_ROLE $USERID $ORGID $SPACEID SpaceAuditor
 
 $SENDMAIL -i $EMAIL <<MAIL_END
+From: DO-NOT-REPLY@tas.hackathon.systems
 Subject: SMU Tanzu Application Service User On-boarding Message
 To: $EMAIL
 Dear $FNAME $LNAME,
 
   Your SMU Tanzu Application Service demo account is ready:
 
-Access URL:\t\thttps://console.tas.hackathon.systems
-UserID:\t\t$USERID
-Password:\t\t$PASSWORD
+Access URL:		https://console.tas.hackathon.systems
+UserID:			$USERID
+Password:		$PASSWORD
+
+This is a system generated email, DO NOT reply to this email address
+Any questions and issues please email to esm.paas@gmail.com
 
 All the best.
 VMware CNA team
