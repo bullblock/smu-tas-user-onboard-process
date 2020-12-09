@@ -120,7 +120,6 @@ done
 
 [ -d "$PWD/.tob" ] && echo "TAS onborading user working dirctory is exsit..." || mkdir -p "$PWD/.tob"
 [ -f "$PWD/.tob/tob.conf" ] && source "$PWD/.tob/tob.conf"  || { echo "the tob.conf file is not exsit" ; exit 1 ; }
-[ -f "$TOB_WORKING_FILE" ] && echo "tob has been ran before ..." || echo -e "Item,Fist Name,Last Name,User ID,eMail,Password,Enabled,Updated" > "$TOB_WORKING_FILE"
 echo -e "Item,Fist Name,Last Name,eMail,Password,Enabled" > "$RESULT"
 [ -z $COMMAND ] && { echo "not able to find command $COMMAND in the system"; exit 1 ; }
 
