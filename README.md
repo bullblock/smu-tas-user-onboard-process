@@ -4,7 +4,7 @@
 This is bash shell script helping SMU users on-bording process, which will create and remove users from TAS.<br/>
 Command syntax:<br/>
 <br/>
-./tob-create -u|--adminid -p|--adminpwd -s|--server -f|--file -r|--result<br/>
+./tob-create -u|--adminid admin_user_id -p|--adminpwd admin_password -s|--server api_server_url -f|--file user_list.csv -r|--result result.csv<br/>
 <br/>
 Prerequst:<br/>
 A user list file is required, and the format is:<br/>
