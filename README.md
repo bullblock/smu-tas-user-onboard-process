@@ -18,5 +18,5 @@ Example:<br/>
 ./tob-create -u admin -p password -s api.domain.com -f user_list.csv -r user_result.csv<br/>
 ./tob-clean -u admin -p password -s api.domain.com -f remove_user_list.cvs -r remove_user_result.csv<br/>
 <br/>
-when user creation, "Enabled" must be "yes" user will be created.<br/>
-when user remove, "Enabled" will not work.<br/>
+when user creation, **"Enabled"** must be **"yes"** user will be created.<br/>
+when user remove, **"Enabled"** will **not** work.<br/>
