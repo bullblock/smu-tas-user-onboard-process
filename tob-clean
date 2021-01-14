@@ -124,7 +124,7 @@ COMMAND=$(which $COMMAND)
 [ -z $COMMAND ] && { echo "not able to find command $COMMAND in the system"; exit 1 ; }
 
 $COMMAND api $SERVER 
-$COMMAND login -u $ADMINID -p $ADMINPWD -o system
+$COMMAND login -u $ADMINID -p $ADMINPWD -o system -s system
 $COMMAND target
 $COMMAND quotas
 
