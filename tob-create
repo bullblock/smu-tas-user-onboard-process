@@ -127,7 +127,7 @@ $COMMAND api $SERVER
 $COMMAND login -u $ADMINID -p $ADMINPWD -o system -s system
 $COMMAND target
 $COMMAND quotas
-#$COMMAND update-org-quota default -m 10G -i 10G -r 10 -s 10 -a 10 --allow-paid-service-plans --reserved-route-ports 10
+#$COMMAND update-org-quota default -m 3G -i 3G -r 10 -s 10 -a 10 --allow-paid-service-plans --reserved-route-ports 10
 
 exec < "$INPUT" || { echo "the input file $INPUT is not exist"; exit 1; }
 read header
@@ -143,7 +143,7 @@ if [ "$STATUS" == "yes" ] && [ ! -z "$EMAIL" ] && [ ! -z "$FNAME" ] && [ ! -z "$
 #  $COMMAND delete-org -f $ORGID
   $COMMAND $CREATE_ORG $ORGID -q default
   $COMMAND $CREATE_SPACE $SPACEID -o $ORGID
-#  $COMMAND delete-user -f $USERID
+  $COMMAND delete-user -f $USERID
   $COMMAND $CREATE_USER $USERID $PASSWORD
   $COMMAND $SET_ORG_ROLE $USERID $ORGID OrgManager
   $COMMAND $SET_ORG_ROLE $USERID $ORGID BillingManager
